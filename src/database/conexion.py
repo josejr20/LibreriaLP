@@ -2,7 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 
 class ConexionDB:
-    def __init__(self, host="localhost", user="root", password="root", database="libreriautp"):
+    def __init__(self, host="localhost", user="root", password="jose20", database="libreriautp"):
         self.host = host
         self.user = user
         self.password = password

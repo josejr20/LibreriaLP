@@ -61,7 +61,10 @@ class LoginView:
         self.txt_password = tk.Entry(frame_cuadro_inner, show="*", font=("Arial", 11), bg="#D9D9D9")
         self.txt_password.pack(fill="x", pady=5)
 
-        # BOTÓN Ing
+        # Bind Enter key para autenticar
+        self.txt_password.bind("<Return>", lambda event: self.autenticar())
+
+        # BOTÓN Ingresar
         btn_ingresar = tk.Button(
             frame_cuadro_inner,
             text="Ingresar",
@@ -89,7 +92,10 @@ class LoginView:
             if user.rol == "administrador":
                 from src.vistas.vista_administrador import VistaAdministrador
                 VistaAdministrador(user)
+            elif user.rol == "empleado":
+                from src.vistas.vista_empleado import VistaEmpleado
+                VistaEmpleado(user)
             else:
-                messagebox.showinfo("Empleado", "Se abrirá la vista de empleado (pendiente)")
+                messagebox.showinfo("Acceso", "Rol no reconocido")
         else:
             messagebox.showerror("Error", "Usuario o contraseña incorrectos.")
