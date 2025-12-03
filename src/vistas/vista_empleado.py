@@ -9,15 +9,13 @@ class VistaEmpleado:
         self.usuario = usuario
         self.window = tk.Tk()
         self.window.title("Panel Empleado - Librería UTP")
-        self.window.geometry("662x450")
+        self.window.geometry("400x320")
         self.window.configure(bg="#728EFF")
 
-        # Header con icono y título
         frame_header = tk.Frame(self.window, bg="#FFFFFF", height=80)
         frame_header.pack(fill="x", padx=10, pady=10)
         frame_header.pack_propagate(False)
 
-        # Icono de usuario (simulado con texto)
         lbl_icon = tk.Label(
             frame_header,
             text="👤",
@@ -27,7 +25,6 @@ class VistaEmpleado:
         )
         lbl_icon.pack(side="left", padx=20)
 
-        # Título Empleado
         lbl_titulo = tk.Label(
             frame_header,
             text="Empleado",
@@ -37,11 +34,9 @@ class VistaEmpleado:
         )
         lbl_titulo.pack(side="left")
 
-        # Frame para los botones del menú lateral
-        frame_menu = tk.Frame(self.window, bg="#E8F0FF", width=200)
+        frame_menu = tk.Frame(self.window, bg="#E8F0FF", width=110)
         frame_menu.pack(side="left", fill="y", padx=(10, 0), pady=(0, 10))
 
-        # Botones del menú
         btn_registrar_pedido = tk.Button(
             frame_menu,
             text="🛒 Registrar Pedido",
@@ -49,7 +44,7 @@ class VistaEmpleado:
             bg="#B3D9FF",
             fg="#000000",
             activebackground="#83B3FF",
-            width=20,
+            width=25,
             height=2,
             relief="flat",
             command=self.abrir_registrar_pedido
@@ -63,7 +58,7 @@ class VistaEmpleado:
             bg="#E8F0FF",
             fg="#000000",
             activebackground="#B3D9FF",
-            width=20,
+            width=25,
             height=2,
             relief="flat",
             command=self.abrir_registrar_entrega
@@ -77,18 +72,16 @@ class VistaEmpleado:
             bg="#E8F0FF",
             fg="#000000",
             activebackground="#B3D9FF",
-            width=20,
+            width=25,
             height=2,
             relief="flat",
             command=self.abrir_busqueda_pedidos
         )
         btn_busqueda.pack(pady=10, padx=10)
 
-        # Frame principal (área azul a la derecha)
         self.frame_principal = tk.Frame(self.window, bg="#728EFF")
         self.frame_principal.pack(side="right", fill="both", expand=True, padx=10, pady=(0, 10))
 
-        # Botón cerrar sesión
         btn_cerrar = tk.Button(
             self.frame_principal,
             text="🚪 Cerrar Sesión",
@@ -103,15 +96,12 @@ class VistaEmpleado:
         self.window.mainloop()
 
     def abrir_registrar_pedido(self):
-        # No destruir la ventana, crear nueva ventana independiente
         RegistrarPedidoView(self.usuario, modo_presentacion=True)
 
     def abrir_registrar_entrega(self):
-        # No destruir la ventana, crear nueva ventana independiente
         RegistrarEntregaView(self.usuario, modo_presentacion=True)
 
     def abrir_busqueda_pedidos(self):
-        # No destruir la ventana, crear nueva ventana independiente
         BusquedaPedidosView(self.usuario, modo_presentacion=True)
 
     def cerrar_sesion(self):

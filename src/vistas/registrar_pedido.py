@@ -11,16 +11,19 @@ class RegistrarPedidoView:
         self.modo_presentacion = modo_presentacion
         
         # Si es modo presentación, crear Toplevel en lugar de Tk
+        # crea una ventana hija en lugar de una nueva ventana principal
         if modo_presentacion:
             self.window = tk.Toplevel()
         else:
             self.window = tk.Tk()
         
         self.window.title("Registrar Pedido - Librería UTP")
-        self.window.geometry("700x800")
+        # Ventana redimensionable y con tamaño mínimo
+        self.window.geometry("900x700")
+        self.window.minsize(700, 600)
+        self.window.resizable(True, True)
         self.window.configure(bg="#728EFF")
 
-        # Header
         frame_header = tk.Frame(self.window, bg="#FFFFFF", height=80)
         frame_header.pack(fill="x", padx=15, pady=15)
         frame_header.pack_propagate(False)
@@ -37,23 +40,28 @@ class RegistrarPedidoView:
         )
         lbl_titulo.pack(side="left")
 
-        # Contenedor principal con scroll
-        canvas = tk.Canvas(self.window, bg="#728EFF")
-        scrollbar = ttk.Scrollbar(self.window, orient="vertical", command=canvas.yview)
-        frame_scrollable = tk.Frame(canvas, bg="#728EFF")
+        # Canvas con contenido scrollable responsive
+        self.canvas = tk.Canvas(self.window, bg="#728EFF", highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.window, orient="vertical", command=self.canvas.yview)
+        frame_scrollable = tk.Frame(self.canvas, bg="#728EFF")
+
+        self.canvas_window = self.canvas.create_window((0, 0), window=frame_scrollable, anchor="nw")
 
         frame_scrollable.bind(
             "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
-        canvas.create_window((0, 0), window=frame_scrollable, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
+        self.canvas.bind(
+            "<Configure>",
+            lambda e: self.canvas.itemconfigure(self.canvas_window, width=e.width)
+        )
 
-        canvas.pack(side="left", fill="both", expand=True, padx=15)
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+        self.canvas.pack(side="left", fill="both", expand=True, padx=15)
         scrollbar.pack(side="right", fill="y")
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
 
-        # ===== DATOS DE CABECERA =====
         frame_cabecera = tk.Frame(frame_scrollable, bg="#FFFFFF", relief="solid", bd=2)
         frame_cabecera.pack(fill="x", pady=10, padx=10)
 
@@ -70,7 +78,6 @@ class RegistrarPedidoView:
         frame_cab_content = tk.Frame(frame_cabecera, bg="#FFFFFF", padx=10, pady=10)
         frame_cab_content.pack(fill="x")
 
-        # Fila 1
         row1 = tk.Frame(frame_cab_content, bg="#FFFFFF")
         row1.pack(fill="x", pady=5)
 
@@ -84,7 +91,6 @@ class RegistrarPedidoView:
         self.txt_fecha_pedido.pack(side="left", padx=10)
         self.txt_fecha_pedido.insert(0, datetime.now().strftime("%Y-%m-%d"))
 
-        # Fila 2
         row2 = tk.Frame(frame_cab_content, bg="#FFFFFF")
         row2.pack(fill="x", pady=5)
 
@@ -97,7 +103,6 @@ class RegistrarPedidoView:
         self.combo_delivery.pack(side="left", padx=10)
         self.cargar_personal_delivery()
 
-        # Observaciones
         row3 = tk.Frame(frame_cab_content, bg="#FFFFFF")
         row3.pack(fill="x", pady=5)
 
@@ -105,7 +110,6 @@ class RegistrarPedidoView:
         self.txt_observaciones = tk.Text(row3, font=("Arial", 10), bg="#B3D9FF", height=3)
         self.txt_observaciones.pack(fill="x", pady=5)
 
-        # ===== DATOS DEL CLIENTE =====
         frame_cliente = tk.Frame(frame_scrollable, bg="#FFFFFF", relief="solid", bd=2)
         frame_cliente.pack(fill="x", pady=10, padx=10)
 
@@ -122,7 +126,6 @@ class RegistrarPedidoView:
         frame_cli_content = tk.Frame(frame_cliente, bg="#FFFFFF", padx=10, pady=10)
         frame_cli_content.pack(fill="x")
 
-        # Búsqueda de cliente
         row_buscar = tk.Frame(frame_cli_content, bg="#FFFFFF")
         row_buscar.pack(fill="x", pady=5)
 
@@ -140,7 +143,6 @@ class RegistrarPedidoView:
         )
         btn_buscar_cliente.pack(side="left", padx=5)
 
-        # Datos del cliente
         self.lbl_cliente_info = tk.Label(
             frame_cli_content,
             text="Seleccione un cliente...",
@@ -151,7 +153,6 @@ class RegistrarPedidoView:
         )
         self.lbl_cliente_info.pack(anchor="w", pady=10)
 
-        # ===== DATOS DEL PRODUCTO =====
         frame_producto = tk.Frame(frame_scrollable, bg="#FFFFFF", relief="solid", bd=2)
         frame_producto.pack(fill="x", pady=10, padx=10)
 
@@ -168,7 +169,6 @@ class RegistrarPedidoView:
         frame_prod_content = tk.Frame(frame_producto, bg="#FFFFFF", padx=10, pady=10)
         frame_prod_content.pack(fill="x")
 
-        # Selección de producto
         row_prod = tk.Frame(frame_prod_content, bg="#FFFFFF")
         row_prod.pack(fill="x", pady=5)
 
@@ -191,7 +191,6 @@ class RegistrarPedidoView:
         )
         btn_agregar.pack(side="left", padx=5)
 
-        # Lista de productos agregados
         frame_lista_prod = tk.Frame(frame_prod_content, bg="#FFFFFF")
         frame_lista_prod.pack(fill="both", expand=True, pady=10)
 
@@ -217,7 +216,6 @@ class RegistrarPedidoView:
         scroll_tree.pack(side="right", fill="y")
         self.tree_productos.configure(yscrollcommand=scroll_tree.set)
 
-        # ===== TOTALES =====
         frame_totales = tk.Frame(frame_scrollable, bg="#FFFFFF", relief="solid", bd=2)
         frame_totales.pack(fill="x", pady=10, padx=10)
 
@@ -239,7 +237,6 @@ class RegistrarPedidoView:
         self.lbl_total = tk.Label(row_tot, text="S/ 0.00", font=("Arial", 11), bg="#B3D9FF", width=15)
         self.lbl_total.pack(side="left", padx=5)
 
-        # ===== BOTONES =====
         frame_botones = tk.Frame(frame_scrollable, bg="#728EFF")
         frame_botones.pack(pady=20)
 
@@ -267,7 +264,6 @@ class RegistrarPedidoView:
 
         self.cliente_seleccionado = None
 
-        # Solo ejecutar mainloop si NO es modo presentación
         if not modo_presentacion:
             self.window.mainloop()
 
@@ -313,35 +309,80 @@ class RegistrarPedidoView:
             if cantidad <= 0:
                 raise ValueError
         except:
-            messagebox.showwarning("Advertencia", "Ingrese una cantidad válida")
+            messagebox.showwarning("Advertencia", "Ingrese una cantidad válida (número entero positivo)")
             return
 
         producto_str = self.combo_producto.get()
         numero_serie = producto_str.split(" - ")[0]
         producto = self.controlador.obtener_producto_por_serie(numero_serie)
 
-        if producto:
-            if cantidad > producto['stock']:
-                messagebox.showwarning("Advertencia", f"Stock insuficiente. Disponible: {producto['stock']}")
-                return
+        if not producto:
+            messagebox.showerror("Error", "Producto no encontrado")
+            return
 
-            subtotal = producto['precio'] * cantidad
-            self.productos_seleccionados.append({
-                'idproducto': producto['idproducto'],
-                'nombre': producto['nombre'],
-                'cantidad': cantidad,
-                'precio': producto['precio'],
-                'subtotal': subtotal
-            })
-
-            self.tree_productos.insert(
-                "",
-                "end",
-                values=(producto['nombre'], cantidad, f"S/ {producto['precio']:.2f}", f"S/ {subtotal:.2f}")
+        # Verificar stock actual del producto
+        stock_disponible = producto.get('stock', 0)
+        if cantidad > stock_disponible:
+            messagebox.showwarning(
+                "Stock Insuficiente",
+                f"Producto: {producto['nombre']}\n"
+                f"Stock disponible: {stock_disponible}\n"
+                f"Cantidad solicitada: {cantidad}\n\n"
+                f"No hay suficiente stock para esta operación."
             )
+            return
 
-            self.actualizar_totales()
-            self.txt_cantidad.delete(0, tk.END)
+        # Verificar que no se agregue el mismo producto dos veces con cantidades insuficientes
+        cantidad_ya_agregada = 0
+        for prod in self.productos_seleccionados:
+            if prod['idproducto'] == producto['idproducto']:
+                cantidad_ya_agregada += prod['cantidad']
+        
+        cantidad_total_solicitada = cantidad_ya_agregada + cantidad
+        if cantidad_total_solicitada > stock_disponible:
+            messagebox.showwarning(
+                "Stock Insuficiente",
+                f"Producto: {producto['nombre']}\n"
+                f"Stock disponible: {stock_disponible}\n"
+                f"Ya agregado: {cantidad_ya_agregada}\n"
+                f"Intenta agregar: {cantidad}\n"
+                f"Total solicitado: {cantidad_total_solicitada}\n\n"
+                f"La cantidad total excede el stock disponible."
+            )
+            return
+
+        # Restar stock inmediatamente en la BD
+        exito, mensaje = self.controlador.restar_stock_en_bd(producto['idproducto'], cantidad)
+        if not exito:
+            messagebox.showerror("Error", f"No se pudo restar el stock: {mensaje}")
+            return
+
+        subtotal = float(producto['precio']) * cantidad
+        self.productos_seleccionados.append({
+            'idproducto': producto['idproducto'],
+            'nombre': producto['nombre'],
+            'cantidad': cantidad,
+            'precio': float(producto['precio']),
+            'subtotal': subtotal
+        })
+
+        self.tree_productos.insert(
+            "",
+            "end",
+            values=(
+                producto['nombre'],
+                cantidad,
+                f"S/ {float(producto['precio']):.2f}",
+                f"S/ {subtotal:.2f}"
+            )
+        )
+
+        self.actualizar_totales()
+        self.txt_cantidad.delete(0, tk.END)
+        messagebox.showinfo(
+            "Producto Agregado",
+            f"{producto['nombre']}\nCantidad: {cantidad}\nStock restante: {stock_disponible - cantidad}"
+        )
 
     def actualizar_totales(self):
         subtotal = sum(p['subtotal'] for p in self.productos_seleccionados)
@@ -370,17 +411,19 @@ class RegistrarPedidoView:
         fecha_pedido = self.txt_fecha_pedido.get()
         fecha_entrega = self.txt_fecha_entrega.get() or None
         observaciones = self.txt_observaciones.get("1.0", tk.END).strip()
-        
+    
         delivery_str = self.combo_delivery.get()
         dni_delivery = delivery_str.split(" - ")[0]
         delivery = self.controlador.obtener_delivery_por_dni(dni_delivery)
 
-        subtotal = sum(p['subtotal'] for p in self.productos_seleccionados)
-        igv = subtotal * 0.18
-        total = subtotal + igv
+        # Calcular totales
+        subtotal = float(sum(p['subtotal'] for p in self.productos_seleccionados))
+        igv = float(subtotal * 0.18)
+        total = float(subtotal + igv)
 
-        # Registrar pedido
-        resultado = self.controlador.registrar_pedido(
+        # El stock, fue restado al agregar cada producto
+        # Solo se registra el pedido en la BD
+        exito, mensaje = self.controlador.registrar_pedido(
             numero_pedido=numero_pedido,
             fecha_pedido=fecha_pedido,
             fecha_entrega=fecha_entrega,
@@ -389,23 +432,21 @@ class RegistrarPedidoView:
             igv=igv,
             total=total,
             idcliente=self.cliente_seleccionado['idcliente'],
-            idusuario=1,  # ID del usuario logueado
+            idusuario=getattr(self.usuario, 'idusuario', 1),
             iddelivery=delivery['iddelivery'] if delivery else None,
             productos=self.productos_seleccionados
         )
 
-        if resultado:
-            messagebox.showinfo("Éxito", "Pedido registrado correctamente")
+        if exito:
+            messagebox.showinfo("Éxito", mensaje)
             if not self.modo_presentacion:
                 self.volver()
             else:
-                # En modo presentación, limpiar el formulario
                 self.limpiar_formulario()
         else:
-            messagebox.showerror("Error", "No se pudo registrar el pedido")
+            messagebox.showerror("Error", mensaje)
 
     def limpiar_formulario(self):
-        """Limpia el formulario después de registrar en modo presentación"""
         # Limpiar productos seleccionados
         for item in self.tree_productos.get_children():
             self.tree_productos.delete(item)
@@ -427,7 +468,9 @@ class RegistrarPedidoView:
 
     def volver(self):
         self.window.destroy()
-        # Solo abrir nueva ventana si NO es modo presentación
         if not self.modo_presentacion:
             from src.vistas.vista_empleado import VistaEmpleado
             VistaEmpleado(self.usuario)
+
+    def _on_mousewheel(self, event):
+        self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")

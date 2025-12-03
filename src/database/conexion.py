@@ -15,7 +15,8 @@ class ConexionDB:
                 host=self.host,
                 user=self.user,
                 password=self.password,
-                database=self.database
+                database=self.database,
+                autocommit=False  # Importante para transacciones manuales
             )
 
             if self.connection.is_connected():
@@ -30,3 +31,41 @@ class ConexionDB:
         if self.connection and self.connection.is_connected():
             self.connection.close()
             print("Conexión cerrada")
+    
+    def ejecutar_query(self, query, parametros=None):
+        """
+        Ejecuta una query y retorna el resultado
+        Útil para SELECT
+        """
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            if parametros:
+                cursor.execute(query, parametros)
+            else:
+                cursor.execute(query)
+            resultado = cursor.fetchall()
+            cursor.close()
+            return resultado
+        except Error as e:
+            print(f"Error al ejecutar query: {e}")
+            return None
+    
+    def ejecutar_insert_update(self, query, parametros=None):
+        """
+        Ejecuta INSERT, UPDATE o DELETE
+        Retorna True si tiene éxito
+        """
+        try:
+            cursor = self.connection.cursor()
+            if parametros:
+                cursor.execute(query, parametros)
+            else:
+                cursor.execute(query)
+            self.connection.commit()
+            last_id = cursor.lastrowid
+            cursor.close()
+            return True, last_id
+        except Error as e:
+            print(f"Error al ejecutar insert/update: {e}")
+            self.connection.rollback()
+            return False, 0

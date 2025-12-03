@@ -8,7 +8,6 @@ class BusquedaPedidosView:
         self.controlador = ControladorPedidos()
         self.modo_presentacion = modo_presentacion
         
-        # Si es modo presentación, crear Toplevel en lugar de Tk
         if modo_presentacion:
             self.window = tk.Toplevel()
         else:
@@ -16,59 +15,58 @@ class BusquedaPedidosView:
         
         self.window.title("Búsqueda de Pedidos - Librería UTP")
         self.window.geometry("900x650")
-        self.window.configure(bg="#728EFF")
+        self.window.minsize(750, 550)
+        self.window.resizable(True, True)
+        self.window.configure(bg="#f0f0f0")
 
-        # Header
-        frame_header = tk.Frame(self.window, bg="#FFFFFF", height=80)
-        frame_header.pack(fill="x", padx=15, pady=15)
+        frame_header = tk.Frame(self.window, bg="#4A63D8", height=70)
+        frame_header.pack(fill="x", padx=0, pady=0)
         frame_header.pack_propagate(False)
 
-        lbl_icon = tk.Label(frame_header, text="🔍", font=("Arial", 24), bg="#FFFFFF")
-        lbl_icon.pack(side="left", padx=20)
+        lbl_icon = tk.Label(frame_header, text="🔍", font=("Arial", 24), bg="#4A63D8")
+        lbl_icon.pack(side="left", padx=20, pady=8)
 
         lbl_titulo = tk.Label(
             frame_header,
             text="Búsqueda de Pedidos",
-            font=("Arial", 20, "bold"),
-            bg="#FFFFFF",
-            fg="#000000"
+            font=("Arial", 18, "bold"),
+            bg="#4A63D8",
+            fg="#FFFFFF"
         )
         lbl_titulo.pack(side="left")
 
-        # Frame principal
-        frame_principal = tk.Frame(self.window, bg="#728EFF")
-        frame_principal.pack(fill="both", expand=True, padx=15, pady=10)
+        frame_principal = tk.Frame(self.window, bg="#f0f0f0")
+        frame_principal.pack(fill="both", expand=True, padx=20, pady=20)
 
-        # ===== CRITERIOS DE BÚSQUEDA =====
-        frame_busqueda = tk.Frame(frame_principal, bg="#FFFFFF", relief="solid", bd=2)
-        frame_busqueda.pack(fill="x", pady=10)
+        frame_busqueda = tk.Frame(frame_principal, bg="#FFFFFF", relief="solid", bd=1)
+        frame_busqueda.pack(fill="x", pady=(0, 15))
 
         lbl_busq_titulo = tk.Label(
             frame_busqueda,
             text="CRITERIOS DE BÚSQUEDA",
-            font=("Arial", 12, "bold"),
-            bg="#5A7FFF",
+            font=("Arial", 13, "bold"),
+            bg="#4A63D8",
             fg="#FFFFFF",
-            pady=5
+            pady=10
         )
         lbl_busq_titulo.pack(fill="x")
 
-        frame_busq_content = tk.Frame(frame_busqueda, bg="#FFFFFF", padx=15, pady=15)
-        frame_busq_content.pack(fill="x")
+        frame_busq_content = tk.Frame(frame_busqueda, bg="#FFFFFF", padx=20, pady=15)
+        frame_busq_content.pack(fill="both", expand=True)
 
-        # Radio buttons para seleccionar criterio
         self.criterio_var = tk.StringVar(value="nombre")
 
         frame_radios = tk.Frame(frame_busq_content, bg="#FFFFFF")
-        frame_radios.pack(fill="x", pady=5)
+        frame_radios.pack(fill="x", pady=(0, 15))
 
         tk.Radiobutton(
             frame_radios,
             text="Por Nombre del Cliente",
             variable=self.criterio_var,
             value="nombre",
-            font=("Arial", 10),
+            font=("Arial", 11),
             bg="#FFFFFF",
+            activebackground="#f0f0f0",
             command=self.cambiar_criterio
         ).pack(side="left", padx=10)
 
@@ -77,8 +75,9 @@ class BusquedaPedidosView:
             text="Por Apellido del Cliente",
             variable=self.criterio_var,
             value="apellido",
-            font=("Arial", 10),
+            font=("Arial", 11),
             bg="#FFFFFF",
+            activebackground="#f0f0f0",
             command=self.cambiar_criterio
         ).pack(side="left", padx=10)
 
@@ -87,69 +86,80 @@ class BusquedaPedidosView:
             text="Por Rango de Fechas",
             variable=self.criterio_var,
             value="rango_fechas",
-            font=("Arial", 10),
+            font=("Arial", 11),
             bg="#FFFFFF",
+            activebackground="#f0f0f0",
             command=self.cambiar_criterio
         ).pack(side="left", padx=10)
 
-        # Frame para búsqueda por texto
         self.frame_texto = tk.Frame(frame_busq_content, bg="#FFFFFF")
         self.frame_texto.pack(fill="x", pady=10)
 
-        tk.Label(self.frame_texto, text="Buscar:", font=("Arial", 10, "bold"), bg="#FFFFFF").pack(side="left")
-        self.txt_buscar = tk.Entry(self.frame_texto, font=("Arial", 10), bg="#B3D9FF", width=30)
-        self.txt_buscar.pack(side="left", padx=10)
+        tk.Label(self.frame_texto, text="Buscar:", font=("Arial", 11, "bold"), bg="#FFFFFF").pack(side="left", padx=(0, 10))
+        self.txt_buscar = tk.Entry(self.frame_texto, font=("Arial", 11), bg="#E8F4F8", width=30, relief="solid", bd=1)
+        self.txt_buscar.pack(side="left", padx=5)
 
         btn_buscar = tk.Button(
             self.frame_texto,
-            text="Buscar",
-            font=("Arial", 10, "bold"),
-            bg="#4CAF50",
+            text="🔍 Buscar",
+            font=("Arial", 11, "bold"),
+            bg="#26A65B",
             fg="#FFFFFF",
+            padx=20,
+            pady=5,
+            cursor="hand2",
+            relief="solid",
+            bd=1,
             command=self.buscar_pedidos
         )
         btn_buscar.pack(side="left", padx=5)
 
-        # Frame para búsqueda por rango de fechas
         self.frame_fechas = tk.Frame(frame_busq_content, bg="#FFFFFF")
 
         row_desde = tk.Frame(self.frame_fechas, bg="#FFFFFF")
         row_desde.pack(fill="x", pady=5)
 
-        tk.Label(row_desde, text="Desde:", font=("Arial", 10, "bold"), bg="#FFFFFF").pack(side="left")
-        self.txt_fecha_desde = tk.Entry(row_desde, font=("Arial", 10), bg="#B3D9FF", width=15)
-        self.txt_fecha_desde.pack(side="left", padx=10)
-        tk.Label(row_desde, text="(YYYY-MM-DD)", font=("Arial", 9, "italic"), bg="#FFFFFF", fg="#666").pack(side="left")
+        tk.Label(row_desde, text="Desde:", font=("Arial", 11, "bold"), bg="#FFFFFF").pack(side="left", padx=(0, 10))
+        self.txt_fecha_desde = tk.Entry(row_desde, font=("Arial", 11), bg="#E8F4F8", width=15, relief="solid", bd=1)
+        self.txt_fecha_desde.pack(side="left", padx=5)
+        tk.Label(row_desde, text="(YYYY-MM-DD)", font=("Arial", 9, "italic"), bg="#FFFFFF", fg="#666").pack(side="left", padx=5)
 
         row_hasta = tk.Frame(self.frame_fechas, bg="#FFFFFF")
         row_hasta.pack(fill="x", pady=5)
 
-        tk.Label(row_hasta, text="Hasta:", font=("Arial", 10, "bold"), bg="#FFFFFF").pack(side="left", padx=(0,8))
-        self.txt_fecha_hasta = tk.Entry(row_hasta, font=("Arial", 10), bg="#B3D9FF", width=15)
-        self.txt_fecha_hasta.pack(side="left", padx=10)
-        tk.Label(row_hasta, text="(YYYY-MM-DD)", font=("Arial", 9, "italic"), bg="#FFFFFF", fg="#666").pack(side="left")
+        tk.Label(row_hasta, text="Hasta:", font=("Arial", 11, "bold"), bg="#FFFFFF").pack(side="left", padx=(0, 10))
+        self.txt_fecha_hasta = tk.Entry(row_hasta, font=("Arial", 11), bg="#E8F4F8", width=15, relief="solid", bd=1)
+        self.txt_fecha_hasta.pack(side="left", padx=5)
+        tk.Label(row_hasta, text="(YYYY-MM-DD)", font=("Arial", 9, "italic"), bg="#FFFFFF", fg="#666").pack(side="left", padx=5)
 
         btn_buscar_fechas = tk.Button(
             self.frame_fechas,
-            text="Buscar",
-            font=("Arial", 10, "bold"),
-            bg="#4CAF50",
+            text="🔍 Buscar",
+            font=("Arial", 11, "bold"),
+            bg="#26A65B",
             fg="#FFFFFF",
+            padx=20,
+            pady=5,
+            cursor="hand2",
+            relief="solid",
+            bd=1,
             command=self.buscar_pedidos
         )
         btn_buscar_fechas.pack(pady=10)
 
-        # ===== LISTA DE PEDIDOS =====
-        frame_lista = tk.Frame(frame_principal, bg="#FFFFFF", relief="solid", bd=2)
-        frame_lista.pack(fill="both", expand=True, pady=10)
+        frame_contenedor = tk.Frame(frame_principal, bg="#f0f0f0")
+        frame_contenedor.pack(fill="both", expand=True, pady=(0, 15))
+
+        frame_lista = tk.Frame(frame_contenedor, bg="#FFFFFF", relief="solid", bd=1)
+        frame_lista.pack(side="left", fill="both", expand=True, padx=(0, 10))
 
         lbl_lista_titulo = tk.Label(
             frame_lista,
             text="RESULTADOS DE BÚSQUEDA",
-            font=("Arial", 12, "bold"),
-            bg="#5A7FFF",
+            font=("Arial", 13, "bold"),
+            bg="#4A63D8",
             fg="#FFFFFF",
-            pady=5
+            pady=10
         )
         lbl_lista_titulo.pack(fill="x")
 
@@ -168,11 +178,11 @@ class BusquedaPedidosView:
         self.tree_pedidos.heading("estado", text="Estado")
         self.tree_pedidos.heading("total", text="Total")
 
-        self.tree_pedidos.column("numero", width=150)
-        self.tree_pedidos.column("fecha", width=120)
-        self.tree_pedidos.column("cliente", width=250)
-        self.tree_pedidos.column("estado", width=100)
-        self.tree_pedidos.column("total", width=100)
+        self.tree_pedidos.column("numero", width=105)
+        self.tree_pedidos.column("fecha", width=74)
+        self.tree_pedidos.column("cliente", width=100)
+        self.tree_pedidos.column("estado", width=70)
+        self.tree_pedidos.column("total", width=70)
 
         self.tree_pedidos.pack(side="left", fill="both", expand=True)
 
@@ -182,17 +192,17 @@ class BusquedaPedidosView:
 
         self.tree_pedidos.bind("<<TreeviewSelect>>", self.ver_detalle_pedido)
 
-        # ===== DETALLE DEL PEDIDO =====
-        frame_detalle = tk.Frame(frame_principal, bg="#FFFFFF", relief="solid", bd=2)
-        frame_detalle.pack(fill="x", pady=10)
+        frame_detalle = tk.Frame(frame_contenedor, bg="#FFFFFF", relief="solid", bd=1)
+        frame_detalle.pack(side="right", fill="y", padx=(10, 0))
+        frame_detalle.config(width=260)
 
         lbl_det_titulo = tk.Label(
             frame_detalle,
-            text="DETALLE DEL PEDIDO SELECCIONADO",
-            font=("Arial", 12, "bold"),
-            bg="#5A7FFF",
+            text="DETALLE DEL PEDIDO",
+            font=("Arial", 13, "bold"),
+            bg="#4A63D8",
             fg="#FFFFFF",
-            pady=5
+            pady=10
         )
         lbl_det_titulo.pack(fill="x")
 
@@ -201,29 +211,36 @@ class BusquedaPedidosView:
 
         self.txt_detalle = tk.Text(
             frame_det_content,
-            font=("Arial", 10),
+            font=("Courier", 10),
             bg="#F5F5F5",
-            height=6,
-            state="disabled"
+            fg="#333333",
+            state="disabled",
+            relief="solid",
+            bd=1,
+            padx=10,
+            pady=10
         )
         self.txt_detalle.pack(fill="both", expand=True)
 
-        # ===== BOTONES =====
-        frame_botones = tk.Frame(frame_principal, bg="#728EFF")
-        frame_botones.pack(pady=15)
+        frame_botones = tk.Frame(frame_principal, bg="#f0f0f0")
+        frame_botones.pack(pady=0)
 
         btn_volver = tk.Button(
             frame_botones,
-            text="Volver",
+            text="← Volver",
             font=("Arial", 12, "bold"),
-            bg="#FF5722",
+            bg="#FF6B6B",
             fg="#FFFFFF",
             width=15,
+            padx=20,
+            pady=10,
+            cursor="hand2",
+            relief="solid",
+            bd=1,
             command=self.volver
         )
         btn_volver.pack()
 
-        # Solo ejecutar mainloop si NO es modo presentación
         if not modo_presentacion:
             self.window.mainloop()
 
@@ -267,6 +284,9 @@ class BusquedaPedidosView:
 
         if not pedidos:
             messagebox.showinfo("Información", "No se encontraron pedidos con los criterios especificados")
+            self.txt_detalle.config(state="normal")
+            self.txt_detalle.delete("1.0", tk.END)
+            self.txt_detalle.config(state="disabled")
             return
 
         for pedido in pedidos:
@@ -280,7 +300,7 @@ class BusquedaPedidosView:
                     pedido['estado'],
                     f"S/ {pedido['total']:.2f}"
                 ),
-                tags=(pedido['idpedido'],)
+                tags=(str(pedido['idpedido']),)
             )
 
     def ver_detalle_pedido(self, event):
@@ -288,27 +308,40 @@ class BusquedaPedidosView:
         if not seleccion:
             return
 
-        item = self.tree_pedidos.item(seleccion[0])
-        idpedido = item['tags'][0]
-        
-        detalles = self.controlador.obtener_detalle_pedido(idpedido)
-        
-        self.txt_detalle.config(state="normal")
-        self.txt_detalle.delete("1.0", tk.END)
-        
-        texto = f"Pedido N°: {item['values'][0]}\n"
-        texto += f"Cliente: {item['values'][2]}\n"
-        texto += f"Estado: {item['values'][3]}\n"
-        texto += f"Total: {item['values'][4]}\n\n"
-        texto += "Productos:\n"
-        texto += "-" * 60 + "\n"
-        
-        for detalle in detalles:
-            texto += f"• {detalle['nombre']} (Serie: {detalle['numero_serie']})\n"
-            texto += f"  Cantidad: {detalle['cantidad']} x S/ {detalle['precio_unit']:.2f} = S/ {detalle['subtotal']:.2f}\n"
-        
-        self.txt_detalle.insert("1.0", texto)
-        self.txt_detalle.config(state="disabled")
+        try:
+            item = self.tree_pedidos.item(seleccion[0])
+            idpedido = int(item['tags'][0])
+            
+            detalles = self.controlador.obtener_detalle_pedido(idpedido)
+            
+            self.txt_detalle.config(state="normal")
+            self.txt_detalle.delete("1.0", tk.END)
+            
+            # Crear formato como boleta
+            texto = "DETALLE DE PEDIDO\n\n"
+            texto += f"Pedido: {item['values'][0]}\n"
+            texto += f"Cliente: {item['values'][2]}\n"
+            texto += f"Estado: {item['values'][3]}\n"
+            texto += f"Total: {item['values'][4]}\n\n"
+            texto += "PRODUCTOS:\n"
+            
+            if detalles:
+                for i, detalle in enumerate(detalles, 1):
+                    precio_unit = float(detalle['precio_unit'])
+                    subtotal = float(detalle['subtotal'])
+                    texto += f"\n{i}. {detalle['nombre']}\n"
+                    texto += f"   Serie: {detalle['numero_serie']}\n"
+                    texto += f"   Cantidad: {detalle['cantidad']} x S/ {precio_unit:.2f}\n"
+                    texto += f"   Subtotal: S/ {subtotal:.2f}\n"
+            else:
+                texto += "\nNo hay productos en este pedido.\n"
+            
+            
+            self.txt_detalle.insert("1.0", texto)
+            self.txt_detalle.config(state="disabled")
+        except Exception as e:
+            print(f"Error al obtener detalle del pedido: {e}")
+            messagebox.showerror("Error", f"Error al obtener detalle: {str(e)}")
 
     def volver(self):
         self.window.destroy()
